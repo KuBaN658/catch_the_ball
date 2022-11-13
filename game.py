@@ -3,7 +3,8 @@ from pygame.draw import *
 from random import randint
 pygame.init()
 
-FPS = 1
+FPS = 30
+difficulty = 1
 screen = pygame.display.set_mode((1200, 900))
 fnt = pygame.font.Font(None, 64)
 
@@ -35,27 +36,40 @@ def new_ball():
     рисует новый шарик
     :return: None
     """
-    global X, Y, R
-    X = randint(100, 1100)
-    Y = randint(100, 900)
-    R = randint(10, 100)
+    global X, Y, R, DX, DY, color
+    X = randint(200, 1000)
+    Y = randint(200, 800)
+    R = randint(11, 100)
+    DX = randint(-10, 10)
+    DY = randint(-10, 10)
     color = COLORS[randint(0, 5)]
     circle(screen, color, (X, Y), R)
 
 
-def click():
+def move_ball():
     """
-    печатает координаты и радиус круга
+    смещает круг
     :return: None
     """
-    print(X, Y, R)
+    global X, Y, DX, DY
+    X = X + DX
+    Y = Y + DY
+    if X - R <= 0:
+        DX = -DX
+    elif X + R >= 1200:
+        DX = -DX
+    elif Y - R <= 0:
+        DY = -DY
+    elif Y + R >= 900:
+        DY = -DY
+    circle(screen, color, (X, Y), R)
 
 
 def is_hit_the_mark(event):
     """
-    печатает ок если есть попадание в круг
+    подсчитывает количество попаданий и промахов
     :param event: обьект события
-    :return: None
+    :return: возвращает True если есть попадание и False если промах
     """
     x, y = event.pos
     diff_x = abs(X - x)
@@ -64,10 +78,12 @@ def is_hit_the_mark(event):
         global hit
         hit += 1
         draw_hits()
+        return True
     else:
         global miss
         miss += 1
         draw_miss()
+        return False
 
 
 def draw_hits():
@@ -94,17 +110,29 @@ clock = pygame.time.Clock()
 finished = False
 
 while not finished:
-    clock.tick(FPS)
+    clock.tick(difficulty)
+    screen.fill(BLACK)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            is_hit_the_mark(event)
-
-
     new_ball()
     pygame.display.update()
-    screen.fill(BLACK)
     draw_interface()
+    is_hit = False
+
+    while not is_hit:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                is_hit = True
+                finished = True
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                is_hit = is_hit_the_mark(event)
+
+        screen.fill(BLACK)
+        move_ball()
+        draw_interface()
+        pygame.display.update()
+
 
 pygame.quit()
