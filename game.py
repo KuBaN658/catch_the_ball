@@ -3,8 +3,8 @@ from pygame.draw import *
 from random import randint
 pygame.init()
 
-FPS = 30
-difficulty = 1
+FPS = 120
+difficulty = 2
 screen = pygame.display.set_mode((1200, 900))
 fnt = pygame.font.Font(None, 64)
 
@@ -18,72 +18,87 @@ BLACK = (0, 0, 0)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 hit = 0
 miss = 0
+ball_number = 10
+X = [0]*ball_number
+Y = [0]*ball_number
+R = [0]*ball_number
+VX = [0]*ball_number
+VY = [0]*ball_number
+COLOR = [0]*ball_number
+count_number_ball = 0
+
+
 def draw_interface():
     """
     рисует интерфейс игры
     :return: none
     """
-    sc_text_hit = fnt.render("Hit", 1, GREEN, BLUE)
-    sc_text_miss = fnt.render("Miss", 1, RED, YELLOW)
+    sc_text_hit = fnt.render("Попадания", True, GREEN, BLUE)
+    sc_text_miss = fnt.render("Промахи", True, RED, YELLOW)
     screen.blit(sc_text_hit, (0, 0))
-    screen.blit(sc_text_miss, (1100, 0))
+    screen.blit(sc_text_miss, (1010, 0))
     draw_miss()
     draw_hits()
 
 
-def new_ball():
+def new_ball(index):
     """
-    рисует новый шарик
+    добавляет очередной шарик
     :return: None
     """
-    global X, Y, R, DX, DY, color
-    X = randint(200, 1000)
-    Y = randint(200, 800)
-    R = randint(11, 100)
-    DX = randint(-10, 10)
-    DY = randint(-10, 10)
-    color = COLORS[randint(0, 5)]
-    circle(screen, color, (X, Y), R)
+    global X, Y, R, VX, VY, COLOR
+    X[index] = randint(200, 1000)
+    Y[index] = randint(200, 800)
+    R[index] = randint(11, 100)
+    VX[index] = randint(-10, 10)
+    VY[index] = randint(-10, 10)
+    COLOR[index] = COLORS[randint(0, 5)]
+    circle(screen, COLOR[index], (X[index], Y[index]), R[index])
 
 
 def move_ball():
     """
-    смещает круг
+    смещает круги на экране
     :return: None
     """
-    global X, Y, DX, DY
-    X = X + DX
-    Y = Y + DY
-    if X - R <= 0:
-        DX = -DX
-    elif X + R >= 1200:
-        DX = -DX
-    elif Y - R <= 0:
-        DY = -DY
-    elif Y + R >= 900:
-        DY = -DY
-    circle(screen, color, (X, Y), R)
+    global X, Y, VX, VY
+    for i in range(ball_number):
+        X[i] = X[i] + VX[i]
+        Y[i] = Y[i] + VY[i]
+        if X[i] - R[i] <= 0:
+            VX[i] = -VX[i]
+        elif X[i] + R[i] >= 1200:
+            VX[i] = -VX[i]
+        elif Y[i] - R[i] <= 0:
+            VY[i] = -VY[i]
+        elif Y[i] + R[i] >= 900:
+            VY[i] = -VY[i]
+        circle(screen, COLOR[i], (X[i], Y[i]), R[i])
 
 
-def is_hit_the_mark(event):
+def is_hit_the_mark(even):
     """
     подсчитывает количество попаданий и промахов
-    :param event: обьект события
+    :param even: обьект события
     :return: возвращает True если есть попадание и False если промах
     """
-    x, y = event.pos
-    diff_x = abs(X - x)
-    diff_y = abs(Y - y)
-    if (diff_x**2 + diff_y**2)**0.5 <= R:
-        global hit
-        hit += 1
-        draw_hits()
-        return True
-    else:
-        global miss
-        miss += 1
-        draw_miss()
-        return False
+    x, y = even.pos
+    for i in range(ball_number):
+        print(i)
+        diff_x = abs(X[i] - x)
+        diff_y = abs(Y[i] - y)
+        print(diff_x, diff_y)
+        if (diff_x**2 + diff_y**2)**0.5 <= R[i]:
+            global hit
+            hit += 1
+            draw_hits()
+            R[i] = 0
+            return True
+        elif i == 9:
+            global miss
+            miss += 1
+            draw_miss()
+            return False
 
 
 def draw_hits():
@@ -91,16 +106,16 @@ def draw_hits():
     Рисует количество попаданий
     :return:
     """
-    sc_text_number_hits = fnt.render(str(hit), 1, GREEN, BLUE)
-    screen.blit(sc_text_number_hits, (10, 50))
+    sc_text_number_hits = fnt.render(str(hit), True, GREEN, BLUE)
+    screen.blit(sc_text_number_hits, (50, 50))
 
 
 def draw_miss():
     """
     Рисует количество попаданий
-    :return:
+    :return: None
     """
-    sc_text_number_hits = fnt.render(str(miss), 1, RED, YELLOW)
+    sc_text_number_hits = fnt.render(str(miss), True, RED, YELLOW)
     screen.blit(sc_text_number_hits, (1130, 50))
 
 
@@ -111,15 +126,13 @@ finished = False
 
 while not finished:
     clock.tick(difficulty)
-    screen.fill(BLACK)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
-    new_ball()
-    pygame.display.update()
     draw_interface()
+    pygame.display.update()
     is_hit = False
-
+    count = 0
     while not is_hit:
         clock.tick(FPS)
         for event in pygame.event.get():
@@ -130,9 +143,13 @@ while not finished:
                 is_hit = is_hit_the_mark(event)
 
         screen.fill(BLACK)
+        if count % 100 == 0 and count > 0:
+            count_number_ball += 1
+            new_ball(count_number_ball % 10)
         move_ball()
         draw_interface()
         pygame.display.update()
+        count += 1
 
 
 pygame.quit()
