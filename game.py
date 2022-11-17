@@ -1,9 +1,11 @@
+import random
+
 import pygame
 from pygame.draw import *
 from random import randint
 pygame.init()
 
-FPS = 120
+FPS = 60
 difficulty = 2
 screen = pygame.display.set_mode((1200, 900))
 fnt = pygame.font.Font(None, 64)
@@ -18,14 +20,20 @@ BLACK = (0, 0, 0)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 hit = 0
 miss = 0
-ball_number = 10
-X = [0]*ball_number
-Y = [0]*ball_number
-R = [0]*ball_number
-VX = [0]*ball_number
-VY = [0]*ball_number
-COLOR = [0]*ball_number
+ball_number = 7
+ball_colorful_number = 3
+X = [0]*(ball_number + ball_colorful_number)
+Y = [0]*(ball_number + ball_colorful_number)
+R = [0]*(ball_number + ball_colorful_number)
+VX = [0]*(ball_number + ball_colorful_number)
+VY = [0]*(ball_number + ball_colorful_number)
+COLOR = [0]*(ball_number + ball_colorful_number)
+SECOND_COLOR = [0]*(ball_number + ball_colorful_number)
+THIRD_COLOR = [0]*(ball_number + ball_colorful_number)
 count_number_ball = 0
+AX = 0.5
+AY = -0.5
+
 
 
 def draw_interface():
@@ -43,17 +51,39 @@ def draw_interface():
 
 def new_ball(index):
     """
-    добавляет очередной шарик
+    добавляет очередной одноцветный шарик
+    :param index: индекск шарика в массивах данных
     :return: None
     """
     global X, Y, R, VX, VY, COLOR
     X[index] = randint(200, 1000)
     Y[index] = randint(200, 800)
-    R[index] = randint(11, 100)
+    R[index] = randint(20, 100)
     VX[index] = randint(-10, 10)
     VY[index] = randint(-10, 10)
     COLOR[index] = COLORS[randint(0, 5)]
     circle(screen, COLOR[index], (X[index], Y[index]), R[index])
+
+
+def new_colorful_ball(index):
+    """
+    Рисует трехцветный круг
+    :param index: индекск шарика в массивах данных
+    :return: None
+    """
+    X, Y, R, VX, VY, COLOR, SECOND_COLOR, THIRD_COLOR
+    X[index] = randint(200, 1000)
+    Y[index] = randint(200, 800)
+    R[index] = randint(40, 80)
+    VX[index] = randint(-10, 10)
+    VY[index] = randint(-10, 10)
+    COLOR[index] = COLORS[randint(0, 1)]
+    SECOND_COLOR[index] = COLORS[randint(2, 3)]
+    THIRD_COLOR[index] = COLORS[randint(4, 5)]
+    circle(screen, COLOR[index], (X[index], Y[index]), R[index])
+    circle(screen, SECOND_COLOR[index], (X[index], Y[index]), R[index]*0.66)
+    circle(screen, THIRD_COLOR[index], (X[index], Y[index]), R[index]*0.33)
+
 
 
 def move_ball():
@@ -62,40 +92,68 @@ def move_ball():
     :return: None
     """
     global X, Y, VX, VY
-    for i in range(ball_number):
-        X[i] = X[i] + VX[i]
-        Y[i] = Y[i] + VY[i]
-        if X[i] - R[i] <= 0:
-            VX[i] = -VX[i]
-        elif X[i] + R[i] >= 1200:
-            VX[i] = -VX[i]
-        elif Y[i] - R[i] <= 0:
-            VY[i] = -VY[i]
-        elif Y[i] + R[i] >= 900:
-            VY[i] = -VY[i]
-        circle(screen, COLOR[i], (X[i], Y[i]), R[i])
+    for i in range(ball_number + ball_colorful_number):
+        if i < 7:
+            if X[i] - R[i] <= 0:
+                VX[i] = -VX[i]
+            elif X[i] + R[i] >= 1200:
+                VX[i] = -VX[i]
+            elif Y[i] - R[i] <= 0:
+                VY[i] = -VY[i]
+            elif Y[i] + R[i] >= 900:
+                VY[i] = -VY[i]
+            X[i] = X[i] + VX[i]
+            Y[i] = Y[i] + VY[i]
+            circle(screen, COLOR[i], (X[i], Y[i]), R[i])
+        else:
+            VX[i] += AX
+            VY[i] += AY
+            X[i] = X[i] + VX[i]
+            Y[i] = Y[i] + VY[i]
+            if X[i] - R[i] <= 0:
+                VX[i] = randint(1, 10)
+                VY[i] = randint(1, 10)
+            elif X[i] + R[i] >= 1200:
+                VX[i] = -randint(1, 10)
+                VY[i] = -randint(1, 10)
+            elif Y[i] - R[i] <= 0:
+                VX[i] = randint(1, 10)
+                VY[i] = randint(1, 10)
+            elif Y[i] + R[i] >= 900:
+                VX[i] = -randint(1, 10)
+                VY[i] = -randint(1, 10)
+            circle(screen, COLOR[i], (X[i], Y[i]), R[i])
+            circle(screen, SECOND_COLOR[i], (X[i], Y[i]), R[i]*0.66)
+            circle(screen, THIRD_COLOR[i], (X[i], Y[i]), R[i]*0.33)
 
 
 def is_hit_the_mark(even):
     """
-    подсчитывает количество попаданий и промахов
+    подсчитывает количество попаданий и промахов.
+    Начисляет очки за поадания
     :param even: обьект события
     :return: возвращает True если есть попадание и False если промах
     """
+    global miss, hit
     x, y = even.pos
-    for i in range(ball_number):
-        print(i)
+    for i in range(ball_number + ball_colorful_number):
         diff_x = abs(X[i] - x)
         diff_y = abs(Y[i] - y)
-        print(diff_x, diff_y)
-        if (diff_x**2 + diff_y**2)**0.5 <= R[i]:
-            global hit
+        if i >= 7 and (diff_x**2 + diff_y**2)**0.5 <= R[i]*0.33:
+            hit += 3
+            draw_hits()
+            R[i] = 0
+            return True
+        elif i >= 7 and (diff_x**2 + diff_y**2)**0.5 <= R[i]*0.66:
+            hit += 2
+            draw_hits()
+            R[i] = 0
+        elif (diff_x**2 + diff_y**2)**0.5 <= R[i]:
             hit += 1
             draw_hits()
             R[i] = 0
             return True
         elif i == 9:
-            global miss
             miss += 1
             draw_miss()
             return False
@@ -145,7 +203,14 @@ while not finished:
         screen.fill(BLACK)
         if count % 100 == 0 and count > 0:
             count_number_ball += 1
-            new_ball(count_number_ball % 10)
+            if count_number_ball % 10 < 7:
+                new_ball(count_number_ball % 10)
+            else:
+                new_colorful_ball(count_number_ball % 10)
+        if count % 20 == 0:
+            AX = -AX
+            AY = -AY
+
         move_ball()
         draw_interface()
         pygame.display.update()
