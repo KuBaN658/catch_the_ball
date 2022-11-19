@@ -1,11 +1,9 @@
-import random
-
 import pygame
 from pygame.draw import *
 from random import randint
 pygame.init()
 
-FPS = 60
+FPS = 75
 difficulty = 2
 screen = pygame.display.set_mode((1200, 900))
 fnt = pygame.font.Font(None, 64)
@@ -17,6 +15,7 @@ GREEN = (0, 255, 0)
 MAGENTA = (255, 0, 255)
 CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 hit = 0
 miss = 0
@@ -33,7 +32,7 @@ THIRD_COLOR = [0]*(ball_number + ball_colorful_number)
 count_number_ball = 0
 AX = 0.5
 AY = -0.5
-
+NAME = ""
 
 
 def draw_interface():
@@ -58,7 +57,7 @@ def new_ball(index):
     global X, Y, R, VX, VY, COLOR
     X[index] = randint(200, 1000)
     Y[index] = randint(200, 800)
-    R[index] = randint(20, 100)
+    R[index] = randint(40, 80)
     VX[index] = randint(-10, 10)
     VY[index] = randint(-10, 10)
     COLOR[index] = COLORS[randint(0, 5)]
@@ -85,13 +84,13 @@ def new_colorful_ball(index):
     circle(screen, THIRD_COLOR[index], (X[index], Y[index]), R[index]*0.33)
 
 
-
 def move_ball():
     """
     смещает круги на экране
     :return: None
     """
     global X, Y, VX, VY
+
     for i in range(ball_number + ball_colorful_number):
         if i < 7:
             if X[i] - R[i] <= 0:
@@ -177,10 +176,100 @@ def draw_miss():
     screen.blit(sc_text_number_hits, (1130, 50))
 
 
-draw_interface()
-pygame.display.update()
+def draw_prompt():
+    """
+    Рисует подсказку о том, что нужно ввести имя
+    :return: None
+    """
+    surf_text = fnt.render("Введите свое имя:", True, WHITE)
+    screen.blit(surf_text, (400, 350))
+
+
+def draw_results():
+    """
+    рисует рэйтинг игроков
+    :return: None
+    """
+    with open("rating.txt") as file:
+        y = 50
+        for line in file:
+            line = line[:-1]
+            surf_text = fnt.render(line, True, WHITE)
+            screen.blit(surf_text, (100, y))
+            y += 50
+
+
+def takes_the_name():
+    """
+    Принимает имя игрока и сохраняет его в глобальную переменную
+    :return: None
+    """
+    global NAME
+    font = pygame.font.Font(None, 32)
+    clock = pygame.time.Clock()
+    input_box = pygame.Rect(450, 400, 300, 32)
+    color_inactive = pygame.Color(GREEN)
+    color_active = pygame.Color(RED)
+    color = color_inactive
+    active = False
+    text = ''
+    done = False
+
+    while not done:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_box.collidepoint(event.pos):
+                    active = not active
+                else:
+                    active = False
+                color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_TAB:
+                    tab = True
+                    while tab:
+                        screen.fill(BLACK)
+                        draw_results()
+                        pygame.display.update()
+                        for events in pygame.event.get():
+                            if events.type == pygame.KEYUP:
+                                if events.key == pygame.K_TAB:
+                                    tab = False
+                if active:
+                    if event.key == pygame.K_RETURN:
+                        NAME = text
+                        return False
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+
+        screen.fill(BLACK)
+        draw_prompt()
+        txt_surface = font.render(text, True, BLUE)
+        width = max(300, txt_surface.get_width() + 10)
+        input_box.w = width
+        screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        pygame.draw.rect(screen, color, input_box, 1)
+
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+
+def save_in_rating():
+    """
+    сохраняет результат игрока в рейтинг
+    :return: None
+    """
+    with open("rating.txt", 'a') as file:
+        print(NAME, "-", hit - miss, file=file)
+
+
 clock = pygame.time.Clock()
-finished = False
+finished = takes_the_name()
 
 while not finished:
     clock.tick(difficulty)
@@ -216,5 +305,7 @@ while not finished:
         pygame.display.update()
         count += 1
 
+if NAME != "":
+    save_in_rating()
 
 pygame.quit()
