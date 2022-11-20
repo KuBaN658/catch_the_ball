@@ -1,4 +1,5 @@
 import pygame
+import pickle
 from pygame.draw import *
 from random import randint
 pygame.init()
@@ -187,16 +188,39 @@ def draw_prompt():
 
 def draw_results():
     """
-    рисует рэйтинг игроков
+    рисует рэйтинг Топ-3 игроков
     :return: None
     """
-    with open("rating.txt") as file:
-        y = 50
-        for line in file:
-            line = line[:-1]
-            surf_text = fnt.render(line, True, WHITE)
-            screen.blit(surf_text, (100, y))
-            y += 50
+    with open("rating.bin", "rb") as file:
+        rating = pickle.load(file)
+
+    y = 50
+    first = 0
+    second = 0
+    third = 0
+    first_name = ""
+    second_name = ""
+    third_name = ""
+    for name in rating:
+        if first < rating[name]:
+            third_name = second_name
+            second_name = first_name
+            first = rating[name]
+            first_name = name
+        elif second < rating[name]:
+            third_name = second_name
+            second = rating[name]
+            second_name = name
+        elif third < rating[name]:
+            third = rating[name]
+            third_name = name
+
+    array_names = [first_name, second_name, third_name]
+
+    for i in array_names:
+        surf_text = fnt.render(i + " " + str(rating[i]), True, WHITE)
+        screen.blit(surf_text, (100, y))
+        y += 50
 
 
 def takes_the_name():
@@ -264,8 +288,11 @@ def save_in_rating():
     сохраняет результат игрока в рейтинг
     :return: None
     """
-    with open("rating.txt", 'a') as file:
-        print(NAME, "-", hit - miss, file=file)
+    with open("rating.bin", "rb") as file:
+        rating = pickle.load(file)
+        rating[NAME] = hit - miss
+    with open("rating.bin", 'wb') as file:
+        pickle.dump(rating, file)
 
 
 clock = pygame.time.Clock()
