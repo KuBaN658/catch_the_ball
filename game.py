@@ -1,5 +1,6 @@
 import pygame
 import pickle
+import draws as ds
 from pygame.draw import *
 from random import randint
 pygame.init()
@@ -36,17 +37,7 @@ AY = -0.5
 NAME = ""
 
 
-def draw_interface():
-    """
-    рисует интерфейс игры
-    :return: none
-    """
-    sc_text_hit = fnt.render("Попадания", True, GREEN, BLUE)
-    sc_text_miss = fnt.render("Промахи", True, RED, YELLOW)
-    screen.blit(sc_text_hit, (0, 0))
-    screen.blit(sc_text_miss, (1010, 0))
-    draw_miss()
-    draw_hits()
+
 
 
 def new_ball(index):
@@ -141,40 +132,25 @@ def is_hit_the_mark(even):
         diff_y = abs(Y[i] - y)
         if i >= 7 and (diff_x**2 + diff_y**2)**0.5 <= R[i]*0.33:
             hit += 3
-            draw_hits()
+            ds.draw_hits(screen, fnt, hit)
             R[i] = 0
             return True
         elif i >= 7 and (diff_x**2 + diff_y**2)**0.5 <= R[i]*0.66:
             hit += 2
-            draw_hits()
+            ds.draw_hits(screen, fnt, hit)
             R[i] = 0
         elif (diff_x**2 + diff_y**2)**0.5 <= R[i]:
             hit += 1
-            draw_hits()
+            ds.draw_hits(screen, fnt, hit)
             R[i] = 0
             return True
         elif i == 9:
             miss += 1
-            draw_miss()
+            ds.draw_miss(screen, fnt, hit)
             return False
 
 
-def draw_hits():
-    """
-    Рисует количество попаданий
-    :return:
-    """
-    sc_text_number_hits = fnt.render(str(hit), True, GREEN, BLUE)
-    screen.blit(sc_text_number_hits, (50, 50))
 
-
-def draw_miss():
-    """
-    Рисует количество попаданий
-    :return: None
-    """
-    sc_text_number_hits = fnt.render(str(miss), True, RED, YELLOW)
-    screen.blit(sc_text_number_hits, (1130, 50))
 
 
 def draw_prompt():
@@ -303,7 +279,7 @@ while not finished:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
-    draw_interface()
+    ds.draw_interface(screen, fnt, miss, hit)
     pygame.display.update()
     is_hit = False
     count = 0
@@ -328,7 +304,7 @@ while not finished:
             AY = -AY
 
         move_ball()
-        draw_interface()
+        ds.draw_interface(screen, fnt, miss, hit)
         pygame.display.update()
         count += 1
 
