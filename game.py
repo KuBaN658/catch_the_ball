@@ -37,24 +37,7 @@ AY = -0.5
 NAME = ""
 
 
-def new_colorful_ball(index):
-    """
-    Рисует трехцветный круг
-    :param index: индекск шарика в массивах данных
-    :return: None
-    """
-    X, Y, R, VX, VY, COLOR, SECOND_COLOR, THIRD_COLOR
-    X[index] = randint(200, 1000)
-    Y[index] = randint(200, 800)
-    R[index] = randint(40, 80)
-    VX[index] = randint(-10, 10)
-    VY[index] = randint(-10, 10)
-    COLOR[index] = COLORS[randint(0, 1)]
-    SECOND_COLOR[index] = COLORS[randint(2, 3)]
-    THIRD_COLOR[index] = COLORS[randint(4, 5)]
-    circle(screen, COLOR[index], (X[index], Y[index]), R[index])
-    circle(screen, SECOND_COLOR[index], (X[index], Y[index]), R[index]*0.66)
-    circle(screen, THIRD_COLOR[index], (X[index], Y[index]), R[index]*0.33)
+
 
 
 def move_ball():
@@ -197,7 +180,6 @@ def takes_the_name():
     done = False
 
     while not done:
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
@@ -218,7 +200,7 @@ def takes_the_name():
                             if events.type == pygame.KEYUP:
                                 if events.key == pygame.K_TAB:
                                     tab = False
-                if active:
+                elif active:
                     if event.key == pygame.K_RETURN:
                         NAME = text
                         return False
@@ -277,9 +259,12 @@ while not finished:
         if count % 100 == 0 and count > 0:
             count_number_ball += 1
             if count_number_ball % 10 < 7:
-                X, Y, R, VX, VY, COLOR = ds.new_ball(count_number_ball % 10, COLORS, screen, X, Y, R, VX, VY, COLOR)
+                X, Y, R, VX, VY, COLOR = ds.new_ball(count_number_ball % 10,
+                                                     COLORS, screen, X, Y, R, VX, VY, COLOR)
             else:
-                new_colorful_ball(count_number_ball % 10)
+                X, Y, R, VX, VY, COLOR, SECOND_COLOR, THIRD_COLOR = \
+                    ds.new_colorful_ball(count_number_ball % 10, COLORS, screen,
+                                         X, Y, R, VX, VY, COLOR, SECOND_COLOR, THIRD_COLOR)
         if count % 20 == 0:
             AX = -AX
             AY = -AY

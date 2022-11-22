@@ -73,3 +73,33 @@ def new_ball(index, COLORS, surface, X, Y, R, VX, VY, COLOR):
     COLOR[index] = COLORS[randint(0, 5)]
     circle(surface, COLOR[index], (X[index], Y[index]), R[index])
     return X, Y, R, VX, VY, COLOR
+
+
+def new_colorful_ball(index, COLORS, surface, X, Y, R, VX, VY, COLOR, SECOND_COLOR, THIRD_COLOR):
+    """
+    создает новый цветной круг
+    :param index: индекс в массивах для хранения данных о круге
+    :param COLORS: массив цветов
+    :param surface: поверхность для рисования
+    :param X: координата х центра круга
+    :param Y: координата у центра круга
+    :param R: радиус круга
+    :param VX: скорость по абциссе
+    :param VY: скорость по ординате
+    :param COLOR: цвет наружней части
+    :param SECOND_COLOR: цвет средней части
+    :param THIRD_COLOR: цвет центральной части
+    :return: X, Y, R, VX, VY, COLOR, SECOND_COLOR, THIRD_COLOR
+    """
+    X[index] = randint(200, 1000)
+    Y[index] = randint(200, 800)
+    R[index] = randint(40, 80)
+    VX[index] = randint(-10, 10)
+    VY[index] = randint(-10, 10)
+    COLOR[index] = COLORS[randint(0, 1)]
+    SECOND_COLOR[index] = COLORS[randint(2, 3)]
+    THIRD_COLOR[index] = COLORS[randint(4, 5)]
+    circle(surface, COLOR[index], (X[index], Y[index]), R[index])
+    circle(surface, SECOND_COLOR[index], (X[index], Y[index]), R[index]*0.66)
+    circle(surface, THIRD_COLOR[index], (X[index], Y[index]), R[index]*0.33)
+    return X, Y, R, VX, VY, COLOR, SECOND_COLOR, THIRD_COLOR
