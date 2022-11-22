@@ -40,46 +40,7 @@ NAME = ""
 
 
 
-def move_ball():
-    """
-    смещает круги на экране
-    :return: None
-    """
-    global X, Y, VX, VY
 
-    for i in range(ball_number + ball_colorful_number):
-        if i < 7:
-            if X[i] - R[i] <= 0:
-                VX[i] = -VX[i]
-            elif X[i] + R[i] >= 1200:
-                VX[i] = -VX[i]
-            elif Y[i] - R[i] <= 0:
-                VY[i] = -VY[i]
-            elif Y[i] + R[i] >= 900:
-                VY[i] = -VY[i]
-            X[i] = X[i] + VX[i]
-            Y[i] = Y[i] + VY[i]
-            circle(screen, COLOR[i], (X[i], Y[i]), R[i])
-        else:
-            VX[i] += AX
-            VY[i] += AY
-            X[i] = X[i] + VX[i]
-            Y[i] = Y[i] + VY[i]
-            if X[i] - R[i] <= 0:
-                VX[i] = randint(1, 10)
-                VY[i] = randint(1, 10)
-            elif X[i] + R[i] >= 1200:
-                VX[i] = -randint(1, 10)
-                VY[i] = -randint(1, 10)
-            elif Y[i] - R[i] <= 0:
-                VX[i] = randint(1, 10)
-                VY[i] = randint(1, 10)
-            elif Y[i] + R[i] >= 900:
-                VX[i] = -randint(1, 10)
-                VY[i] = -randint(1, 10)
-            circle(screen, COLOR[i], (X[i], Y[i]), R[i])
-            circle(screen, SECOND_COLOR[i], (X[i], Y[i]), R[i]*0.66)
-            circle(screen, THIRD_COLOR[i], (X[i], Y[i]), R[i]*0.33)
 
 
 def is_hit_the_mark(even):
@@ -269,7 +230,8 @@ while not finished:
             AX = -AX
             AY = -AY
 
-        move_ball()
+        X, Y, VX, VY = ds.move_ball(screen, X, Y, R, VX, VY, AX, AY, COLOR,
+                                    SECOND_COLOR, THIRD_COLOR, ball_number, ball_colorful_number)
         ds.draw_interface(screen, fnt, miss, hit)
         pygame.display.update()
         count += 1

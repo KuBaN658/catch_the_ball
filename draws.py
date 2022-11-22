@@ -30,7 +30,8 @@ def draw_miss(surface, font, miss):
     surface.blit(sc_text_number_hits, (1130, 50))
 
 
-def draw_interface(surface, font, miss, hit, color_font_hit=GREEN, color_background_hit=BLUE, color_font_miss=RED, color_background_miss=YELLOW):
+def draw_interface(surface, font, miss, hit, color_font_hit=GREEN,
+                   color_background_hit=BLUE, color_font_miss=RED, color_background_miss=YELLOW):
     """
     рисует промахи и попадания в игре
     :param surface: поверхность для отображения
@@ -103,3 +104,42 @@ def new_colorful_ball(index, COLORS, surface, X, Y, R, VX, VY, COLOR, SECOND_COL
     circle(surface, SECOND_COLOR[index], (X[index], Y[index]), R[index]*0.66)
     circle(surface, THIRD_COLOR[index], (X[index], Y[index]), R[index]*0.33)
     return X, Y, R, VX, VY, COLOR, SECOND_COLOR, THIRD_COLOR
+
+
+def move_ball(surface, X, Y, R, VX, VY, AX, AY, COLOR, SECOND_COLOR, THIRD_COLOR, ball_number, ball_colorful_number):
+    for i in range(ball_number + ball_colorful_number):
+        if i < 7:
+            if X[i] - R[i] <= 0:
+                VX[i] = -VX[i]
+            elif X[i] + R[i] >= 1200:
+                VX[i] = -VX[i]
+            elif Y[i] - R[i] <= 0:
+                VY[i] = -VY[i]
+            elif Y[i] + R[i] >= 900:
+                VY[i] = -VY[i]
+            X[i] = X[i] + VX[i]
+            Y[i] = Y[i] + VY[i]
+            circle(surface, COLOR[i], (X[i], Y[i]), R[i])
+        else:
+            VX[i] += AX
+            VY[i] += AY
+            X[i] = X[i] + VX[i]
+            Y[i] = Y[i] + VY[i]
+            if X[i] - R[i] <= 0:
+                VX[i] = randint(1, 10)
+                VY[i] = randint(1, 10)
+            elif X[i] + R[i] >= 1200:
+                VX[i] = -randint(1, 10)
+                VY[i] = -randint(1, 10)
+            elif Y[i] - R[i] <= 0:
+                VX[i] = randint(1, 10)
+                VY[i] = randint(1, 10)
+            elif Y[i] + R[i] >= 900:
+                VX[i] = -randint(1, 10)
+                VY[i] = -randint(1, 10)
+            circle(surface, COLOR[i], (X[i], Y[i]), R[i])
+            circle(surface, SECOND_COLOR[i], (X[i], Y[i]), R[i]*0.66)
+            circle(surface, THIRD_COLOR[i], (X[i], Y[i]), R[i]*0.33)
+    return X, Y, VX, VY
+
+
