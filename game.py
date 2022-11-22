@@ -37,25 +37,6 @@ AY = -0.5
 NAME = ""
 
 
-
-
-
-def new_ball(index):
-    """
-    добавляет очередной одноцветный шарик
-    :param index: индекск шарика в массивах данных
-    :return: None
-    """
-    global X, Y, R, VX, VY, COLOR
-    X[index] = randint(200, 1000)
-    Y[index] = randint(200, 800)
-    R[index] = randint(40, 80)
-    VX[index] = randint(-10, 10)
-    VY[index] = randint(-10, 10)
-    COLOR[index] = COLORS[randint(0, 5)]
-    circle(screen, COLOR[index], (X[index], Y[index]), R[index])
-
-
 def new_colorful_ball(index):
     """
     Рисует трехцветный круг
@@ -296,7 +277,7 @@ while not finished:
         if count % 100 == 0 and count > 0:
             count_number_ball += 1
             if count_number_ball % 10 < 7:
-                new_ball(count_number_ball % 10)
+                X, Y, R, VX, VY, COLOR = ds.new_ball(count_number_ball % 10, COLORS, screen, X, Y, R, VX, VY, COLOR)
             else:
                 new_colorful_ball(count_number_ball % 10)
         if count % 20 == 0:
