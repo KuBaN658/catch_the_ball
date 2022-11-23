@@ -143,3 +143,33 @@ def move_ball(surface, X, Y, R, VX, VY, AX, AY, COLOR, SECOND_COLOR, THIRD_COLOR
     return X, Y, VX, VY
 
 
+def is_hit_the_mark(even, surface, font, X, Y, R, ball_number, ball_colorful_number, hit, miss):
+    """
+    подсчитывает количество попаданий и промахов.
+    Начисляет очки за поадания
+    :param even: обьект события
+    :return: возвращает True если есть попадание и False если промах
+    """
+    x, y = even.pos
+    for i in range(ball_number + ball_colorful_number):
+        diff_x = abs(X[i] - x)
+        diff_y = abs(Y[i] - y)
+        if i >= 7 and (diff_x**2 + diff_y**2)**0.5 <= R[i]*0.33:
+            hit += 3
+            draw_hits(surface, font, hit)
+            R[i] = 0
+            return True, hit, miss
+        elif i >= 7 and (diff_x**2 + diff_y**2)**0.5 <= R[i]*0.66:
+            hit += 2
+            draw_hits(surface, font, hit)
+            R[i] = 0
+            return True, hit, miss
+        elif (diff_x**2 + diff_y**2)**0.5 <= R[i]:
+            hit += 1
+            draw_hits(surface, font, hit)
+            R[i] = 0
+            return True, hit, miss
+        elif i == 9:
+            miss += 1
+            draw_miss(surface, font, hit)
+            return False, hit, miss

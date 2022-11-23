@@ -41,43 +41,6 @@ NAME = ""
 
 
 
-
-
-def is_hit_the_mark(even):
-    """
-    подсчитывает количество попаданий и промахов.
-    Начисляет очки за поадания
-    :param even: обьект события
-    :return: возвращает True если есть попадание и False если промах
-    """
-    global miss, hit
-    x, y = even.pos
-    for i in range(ball_number + ball_colorful_number):
-        diff_x = abs(X[i] - x)
-        diff_y = abs(Y[i] - y)
-        if i >= 7 and (diff_x**2 + diff_y**2)**0.5 <= R[i]*0.33:
-            hit += 3
-            ds.draw_hits(screen, fnt, hit)
-            R[i] = 0
-            return True
-        elif i >= 7 and (diff_x**2 + diff_y**2)**0.5 <= R[i]*0.66:
-            hit += 2
-            ds.draw_hits(screen, fnt, hit)
-            R[i] = 0
-        elif (diff_x**2 + diff_y**2)**0.5 <= R[i]:
-            hit += 1
-            ds.draw_hits(screen, fnt, hit)
-            R[i] = 0
-            return True
-        elif i == 9:
-            miss += 1
-            ds.draw_miss(screen, fnt, hit)
-            return False
-
-
-
-
-
 def draw_prompt():
     """
     Рисует подсказку о том, что нужно ввести имя
@@ -214,7 +177,7 @@ while not finished:
                 is_hit = True
                 finished = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                is_hit = is_hit_the_mark(event)
+                is_hit, hit, miss = ds.is_hit_the_mark(event, screen, fnt, X, Y, R, ball_number, ball_colorful_number, hit, miss)
 
         screen.fill(BLACK)
         if count % 100 == 0 and count > 0:
