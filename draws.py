@@ -1,5 +1,7 @@
 from random import randint
 from pygame.draw import circle
+import pickle
+
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
@@ -173,3 +175,55 @@ def is_hit_the_mark(even, surface, font, X, Y, R, ball_number, ball_colorful_num
             miss += 1
             draw_miss(surface, font, hit)
             return False, hit, miss
+
+
+def draw_prompt(surface, font, color):
+    """
+    рисует подсказку что надо ввести имя
+    :param surface: поверохность для рисования
+    :param font: шрифт написания подсказки
+    :param color: цвет шрифта
+    :return: None
+    """
+    surf_text = font.render("Введите свое имя:", True, color)
+    surface.blit(surf_text, (400, 350))
+
+
+def draw_results(surface, font, color):
+    """
+    Рисует рейтинг игроков
+    :param surface: поверхность для рисования
+    :param font: шрифт написания рейтинга
+    :param color: цвет шрифта
+    :return: None
+    """
+    with open("rating.bin", "rb") as file:
+        rating = pickle.load(file)
+
+    y = 50
+    first = 0
+    second = 0
+    third = 0
+    first_name = ""
+    second_name = ""
+    third_name = ""
+    for name in rating:
+        if first < rating[name]:
+            third_name = second_name
+            second_name = first_name
+            first = rating[name]
+            first_name = name
+        elif second < rating[name]:
+            third_name = second_name
+            second = rating[name]
+            second_name = name
+        elif third < rating[name]:
+            third = rating[name]
+            third_name = name
+
+    array_names = [first_name, second_name, third_name]
+
+    for i in array_names:
+        surf_text = font.render(i + " " + str(rating[i]), True, color)
+        surface.blit(surf_text, (100, y))
+        y += 50

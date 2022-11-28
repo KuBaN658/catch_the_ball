@@ -1,8 +1,6 @@
 import pygame
 import pickle
 import draws as ds
-from pygame.draw import *
-from random import randint
 pygame.init()
 
 FPS = 75
@@ -40,53 +38,6 @@ NAME = ""
 
 
 
-
-def draw_prompt():
-    """
-    Рисует подсказку о том, что нужно ввести имя
-    :return: None
-    """
-    surf_text = fnt.render("Введите свое имя:", True, WHITE)
-    screen.blit(surf_text, (400, 350))
-
-
-def draw_results():
-    """
-    рисует рэйтинг Топ-3 игроков
-    :return: None
-    """
-    with open("rating.bin", "rb") as file:
-        rating = pickle.load(file)
-
-    y = 50
-    first = 0
-    second = 0
-    third = 0
-    first_name = ""
-    second_name = ""
-    third_name = ""
-    for name in rating:
-        if first < rating[name]:
-            third_name = second_name
-            second_name = first_name
-            first = rating[name]
-            first_name = name
-        elif second < rating[name]:
-            third_name = second_name
-            second = rating[name]
-            second_name = name
-        elif third < rating[name]:
-            third = rating[name]
-            third_name = name
-
-    array_names = [first_name, second_name, third_name]
-
-    for i in array_names:
-        surf_text = fnt.render(i + " " + str(rating[i]), True, WHITE)
-        screen.blit(surf_text, (100, y))
-        y += 50
-
-
 def takes_the_name():
     """
     Принимает имя игрока и сохраняет его в глобальную переменную
@@ -118,7 +69,7 @@ def takes_the_name():
                     tab = True
                     while tab:
                         screen.fill(BLACK)
-                        draw_results()
+                        ds.draw_results(screen, fnt, WHITE)
                         pygame.display.update()
                         for events in pygame.event.get():
                             if events.type == pygame.KEYUP:
@@ -134,7 +85,7 @@ def takes_the_name():
                         text += event.unicode
 
         screen.fill(BLACK)
-        draw_prompt()
+        ds.draw_prompt(screen, fnt, WHITE)
         txt_surface = font.render(text, True, BLUE)
         width = max(300, txt_surface.get_width() + 10)
         input_box.w = width
@@ -143,7 +94,6 @@ def takes_the_name():
 
         pygame.display.update()
         clock.tick(FPS)
-
 
 
 def save_in_rating():
