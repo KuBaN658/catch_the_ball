@@ -200,7 +200,6 @@ def draw_results(surface, font, color):
     """
     with open("rating.bin", "rb") as file:
         rating = pickle.load(file)
-    print(rating)
     y = 50
     first = 0
     second = 0
@@ -224,11 +223,8 @@ def draw_results(surface, font, color):
         elif third < rating[name]:
             third = rating[name]
             third_name = name
-        print(first, first_name, second, second_name, third, third_name)
 
     array_names = [first_name, second_name, third_name]
-    print(array_names)
-
     for i in array_names:
         surf_text = font.render(i + " " + str(rating[i]), True, color)
         surface.blit(surf_text, (100, y))

@@ -95,7 +95,8 @@ def save_in_rating():
     """
     with open("rating.bin", "rb") as file:
         rating = pickle.load(file)
-        rating[NAME] = hit - miss
+        if rating[NAME] < hit - miss:
+            rating[NAME] = hit - miss
     with open("rating.bin", 'wb') as file:
         pickle.dump(rating, file)
 
