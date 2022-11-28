@@ -44,9 +44,9 @@ def takes_the_name():
     :return: None
     """
     global NAME
-    font = pygame.font.Font(None, 32)
-    clock = pygame.time.Clock()
-    input_box = pygame.Rect(450, 400, 300, 32)
+    font_promt = pygame.font.Font(None, 48)
+
+    input_box = pygame.Rect(450, 400, 300, 40)
     color_inactive = pygame.Color(GREEN)
     color_active = pygame.Color(RED)
     color = color_inactive
@@ -74,6 +74,7 @@ def takes_the_name():
                         for events in pygame.event.get():
                             if events.type == pygame.KEYUP:
                                 if events.key == pygame.K_TAB:
+                                    ds.draws_start_game(screen, BLACK, font_promt, WHITE, color, text, input_box, clock)
                                     tab = False
                 elif active:
                     if event.key == pygame.K_RETURN:
@@ -83,17 +84,8 @@ def takes_the_name():
                         text = text[:-1]
                     else:
                         text += event.unicode
+        ds.draws_start_game(screen, BLACK, font_promt, WHITE, color, text, input_box, clock)
 
-        screen.fill(BLACK)
-        ds.draw_prompt(screen, fnt, WHITE)
-        txt_surface = font.render(text, True, BLUE)
-        width = max(300, txt_surface.get_width() + 10)
-        input_box.w = width
-        screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
-        pygame.draw.rect(screen, color, input_box, 1)
-
-        pygame.display.update()
-        clock.tick(FPS)
 
 
 def save_in_rating():

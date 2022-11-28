@@ -1,6 +1,7 @@
 from random import randint
 from pygame.draw import circle
 import pickle
+import pygame
 
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -177,7 +178,7 @@ def is_hit_the_mark(even, surface, font, X, Y, R, ball_number, ball_colorful_num
             return False, hit, miss
 
 
-def draw_prompt(surface, font, color):
+def draw_prompt(surface, font, color, coords):
     """
     рисует подсказку что надо ввести имя
     :param surface: поверохность для рисования
@@ -186,7 +187,7 @@ def draw_prompt(surface, font, color):
     :return: None
     """
     surf_text = font.render("Введите свое имя:", True, color)
-    surface.blit(surf_text, (400, 350))
+    surface.blit(surf_text, coords)
 
 
 def draw_results(surface, font, color):
@@ -199,7 +200,7 @@ def draw_results(surface, font, color):
     """
     with open("rating.bin", "rb") as file:
         rating = pickle.load(file)
-
+    print(rating)
     y = 50
     first = 0
     second = 0
@@ -211,19 +212,48 @@ def draw_results(surface, font, color):
         if first < rating[name]:
             third_name = second_name
             second_name = first_name
-            first = rating[name]
             first_name = name
+            third = second
+            second = first
+            first = rating[name]
         elif second < rating[name]:
             third_name = second_name
-            second = rating[name]
             second_name = name
+            third = second
+            second = rating[name]
         elif third < rating[name]:
             third = rating[name]
             third_name = name
+        print(first, first_name, second, second_name, third, third_name)
 
     array_names = [first_name, second_name, third_name]
+    print(array_names)
 
     for i in array_names:
         surf_text = font.render(i + " " + str(rating[i]), True, color)
         surface.blit(surf_text, (100, y))
         y += 50
+
+
+def draws_start_game(surface, background, font, color_prompt, color_rect, text, input_box, clock):
+    """
+    рисует интерфейс ввода имени игрока
+    :param surface: поверхность для рисования
+    :param background: цвет заднего фона
+    :param font: шрифт
+    :param color: цвет шрифта
+    :param text: текст
+    :param input_box: прямоугольник ввода имени
+    :param clock: количество обновлений монитора
+    :return: None
+    """
+    surface.fill(background)
+    draw_prompt(surface, font, color_prompt, (450, 350))
+    txt_surface = font.render(text, True, BLUE)
+    width = max(300, txt_surface.get_width() + 10)
+    input_box.w = width
+    surface.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+    pygame.draw.rect(surface, color_rect, input_box, 1)
+
+    pygame.display.update()
+    clock.tick(1)
