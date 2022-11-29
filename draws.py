@@ -253,3 +253,75 @@ def draws_start_game(surface, background, font, color_prompt, color_rect, text, 
 
     pygame.display.update()
     clock.tick(1)
+
+
+def save_in_rating(NAME, hit, miss):
+    """
+    Если результат игрока улучшен или это новый игрок данные добавляются в словарь
+    :param NAME: Имя игрока
+    :param hit: количество попаданий
+    :param miss: количество промахов
+    :return: None
+    """
+    with open("rating.bin", "rb") as file:
+        rating = pickle.load(file)
+        if rating[NAME] < hit - miss:
+            rating[NAME] = hit - miss
+    with open("rating.bin", 'wb') as file:
+        pickle.dump(rating, file)
+
+
+def takes_the_name(surface, color_background, color_text, font, clock):
+    """
+    получает имя игрока и выводит общий рейтинг
+    :param surface: поверхность для рисования
+    :param color_background: цвет фона
+    :param color_text: цвет текста
+    :param font: шрифт
+    :param clock: частота обновления экрана
+    :return: None
+    """
+    global NAME
+    font_prompt = pygame.font.Font(None, 48)
+    input_box = pygame.Rect(450, 400, 300, 40)
+    color_inactive = pygame.Color(GREEN)
+    color_active = pygame.Color(RED)
+    color = color_inactive
+    active = False
+    text = ''
+    done = False
+
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_box.collidepoint(event.pos):
+                    active = not active
+                else:
+                    active = False
+                color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_TAB:
+                    tab = True
+                    while tab:
+                        surface.fill(color)
+                        draw_results(surface, font, color_text)
+                        pygame.display.update()
+                        for events in pygame.event.get():
+                            if events.type == pygame.KEYUP:
+                                if events.key == pygame.K_TAB:
+                                    draws_start_game(surface, color_background, font_prompt,
+                                                     color_text, color, text, input_box, clock)
+                                    tab = False
+                elif active:
+                    if event.key == pygame.K_RETURN:
+                        NAME = text
+                        return False
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+        draws_start_game(surface, color_background, font_prompt, color_text, color, text,
+                         input_box, clock)
+        

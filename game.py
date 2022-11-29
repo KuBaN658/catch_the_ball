@@ -1,5 +1,4 @@
 import pygame
-import pickle
 import draws as ds
 pygame.init()
 
@@ -38,71 +37,11 @@ NAME = ""
 
 
 
-def takes_the_name():
-    """
-    Принимает имя игрока и сохраняет его в глобальную переменную
-    :return: None
-    """
-    global NAME
-    font_promt = pygame.font.Font(None, 48)
 
-    input_box = pygame.Rect(450, 400, 300, 40)
-    color_inactive = pygame.Color(GREEN)
-    color_active = pygame.Color(RED)
-    color = color_inactive
-    active = False
-    text = ''
-    done = False
-
-    while not done:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return True
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if input_box.collidepoint(event.pos):
-                    active = not active
-                else:
-                    active = False
-                color = color_active if active else color_inactive
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_TAB:
-                    tab = True
-                    while tab:
-                        screen.fill(BLACK)
-                        ds.draw_results(screen, fnt, WHITE)
-                        pygame.display.update()
-                        for events in pygame.event.get():
-                            if events.type == pygame.KEYUP:
-                                if events.key == pygame.K_TAB:
-                                    ds.draws_start_game(screen, BLACK, font_promt, WHITE, color, text, input_box, clock)
-                                    tab = False
-                elif active:
-                    if event.key == pygame.K_RETURN:
-                        NAME = text
-                        return False
-                    elif event.key == pygame.K_BACKSPACE:
-                        text = text[:-1]
-                    else:
-                        text += event.unicode
-        ds.draws_start_game(screen, BLACK, font_promt, WHITE, color, text, input_box, clock)
-
-
-
-def save_in_rating():
-    """
-    сохраняет результат игрока в рейтинг
-    :return: None
-    """
-    with open("rating.bin", "rb") as file:
-        rating = pickle.load(file)
-        if rating[NAME] < hit - miss:
-            rating[NAME] = hit - miss
-    with open("rating.bin", 'wb') as file:
-        pickle.dump(rating, file)
 
 
 clock = pygame.time.Clock()
-finished = takes_the_name()
+finished = ds.takes_the_name(screen, BLACK, WHITE, fnt, clock)
 
 while not finished:
     clock.tick(difficulty)
@@ -143,6 +82,6 @@ while not finished:
         count += 1
 
 if NAME != "":
-    save_in_rating()
+    ds.save_in_rating(NAME, hit, miss)
 
 pygame.quit()
