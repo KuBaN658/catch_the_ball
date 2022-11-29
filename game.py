@@ -33,15 +33,8 @@ AX = 0.5
 AY = -0.5
 NAME = ""
 
-
-
-
-
-
-
-
 clock = pygame.time.Clock()
-finished = ds.takes_the_name(screen, BLACK, WHITE, fnt, clock)
+finished = ds.takes_the_name(screen, BLACK, WHITE, fnt, FPS, clock)
 
 while not finished:
     clock.tick(difficulty)

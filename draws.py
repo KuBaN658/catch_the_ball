@@ -110,6 +110,23 @@ def new_colorful_ball(index, COLORS, surface, X, Y, R, VX, VY, COLOR, SECOND_COL
 
 
 def move_ball(surface, X, Y, R, VX, VY, AX, AY, COLOR, SECOND_COLOR, THIRD_COLOR, ball_number, ball_colorful_number):
+    """
+    отрисовывает движение шариков
+    :param surface: поверхность для рисования
+    :param X: х центра круга
+    :param Y: у центра круга
+    :param R: радиус круга
+    :param VX: скорость по х
+    :param VY: скорость по у
+    :param AX: ускорение по х
+    :param AY: ускорение по у
+    :param COLOR: цвет круга
+    :param SECOND_COLOR: второй цвет круга
+    :param THIRD_COLOR: третий цвет круга
+    :param ball_number: количество обычных кругов
+    :param ball_colorful_number: количество цветных кругов
+    :return: None
+    """
     for i in range(ball_number + ball_colorful_number):
         if i < 7:
             if X[i] - R[i] <= 0:
@@ -271,7 +288,7 @@ def save_in_rating(NAME, hit, miss):
         pickle.dump(rating, file)
 
 
-def takes_the_name(surface, color_background, color_text, font, clock):
+def takes_the_name(surface, color_background, color_text, font, FPS, clock):
     """
     получает имя игрока и выводит общий рейтинг
     :param surface: поверхность для рисования
@@ -292,6 +309,7 @@ def takes_the_name(surface, color_background, color_text, font, clock):
     done = False
 
     while not done:
+        clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
@@ -305,7 +323,7 @@ def takes_the_name(surface, color_background, color_text, font, clock):
                 if event.key == pygame.K_TAB:
                     tab = True
                     while tab:
-                        surface.fill(color)
+                        surface.fill(color_background)
                         draw_results(surface, font, color_text)
                         pygame.display.update()
                         for events in pygame.event.get():
@@ -324,4 +342,3 @@ def takes_the_name(surface, color_background, color_text, font, clock):
                         text += event.unicode
         draws_start_game(surface, color_background, font_prompt, color_text, color, text,
                          input_box, clock)
-        
